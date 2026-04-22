@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Solver API</title>
+</head>
+<body>
+    <h1>Math Solver API</h1>
+    <p>Endpoint: <code>?q=Your Question</code></p>
+
+    <script>
+        function solve(query) {
+            query = query.trim();
+            
+            const patterns = [
+                { regex: /^What is (\d+)\s*\+\s*(\d+)\?$/i, fn: (a, b) => `The sum is ${a + b}.` },
+                { regex: /^What is (\d+)\s*-\s*(\d+)\?$/i, fn: (a, b) => `The difference is ${a - b}.` },
+                { regex: /^What is (\d+)\s*\*\s*(\d+)\?$/i, fn: (a, b) => `The product is ${a * b}.` },
+                { regex: /^What is (\d+)\s*\/\s*(\d+)\?$/i, fn: (a, b) => b != 0 ? `The quotient is ${a / b}.` : "Error: Division by zero." },
+                { regex: /^What is (\d+)\s*\^\s*(\d+)\?$/i, fn: (a, b) => `The result is ${a ** b}.` },
+                { regex: /^What is the square root of (\d+)\??$/i, fn: a => `The square root is ${Math.sqrt(a)}.` },
+                { regex: /^What is (\d+)\s*\+\s*(\d+)\s*\+\s*(\d+)\?$/i, fn: (a, b, c) => `The sum is ${a + b + c}.` },
+            ];
+            
+            for (const p of patterns) {
+                const match = query.match(p.regex);
+                if (match) {
+                    const nums = match.slice(1).map(Number);
+                    return p.fn(...nums);
+                }
+            }
+            
+            return "Could not understand the query.";
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const q = urlParams.get('q');
+
+        if (q) {
+            const result = solve(q);
+            document.body.innerHTML = `<pre>${JSON.stringify({ answer: result })}</pre>`;
+        }
+    </script>
+</body>
+</html>
