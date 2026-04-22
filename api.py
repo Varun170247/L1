@@ -1,6 +1,12 @@
-import sys
+from fastapi import FastAPI
+from pydantic import BaseModel
 import re
 import math
+
+app = FastAPI()
+
+class Query(BaseModel):
+    question: str
 
 def solve(query):
     query = query.strip()
@@ -26,7 +32,10 @@ def solve(query):
     
     return "Could not understand the query."
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        query = " ".join(sys.argv[1:])
-        print(solve(query))
+@app.post("/v1/answer")
+def get_answer(query: Query):
+    return {"answer": solve(query.question)}
+
+@app.get("/")
+def home():
+    return {"message": "Math Solver API", "endpoint": "/v1/answer"}
